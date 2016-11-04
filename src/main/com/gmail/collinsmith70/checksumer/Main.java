@@ -10,6 +10,7 @@ import org.apache.commons.cli.ParseException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -24,17 +25,19 @@ public class Main {
   private static final Options OPTIONS = new Options();
   static {
     OPTIONS.addOption("h", "help", false, "Prints this message");
-    OPTIONS.addOption("m", "mode", true, "Algorithm to use (only md5 supported currently)");
+    OPTIONS.addOption("m", "mode", true, "Algorithm to use (Defaults to MD5)");
     OPTIONS.addOption("e", "equals", true, "Validates that the hash against this string");
+    OPTIONS.addOption("v", "verbose", false, "Increases the verbosity of the command");
   }
 
   public static void main(String... args) throws ParseException, IOException {
     CommandLineParser parser = new DefaultParser();
     CommandLine cli = parser.parse(OPTIONS, args);
 
+    boolean verbose = cli.hasOption("v");
+
     if (cli.hasOption("h")) {
-      HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp("chk", OPTIONS);
+      printHelp();
       System.exit(0);
     }
 
@@ -49,9 +52,21 @@ public class Main {
     }
 
     List<String> argsList = cli.getArgList();
-    String file = argsList.get(0);
-    System.out.println("Digesting " + file);
-    try (InputStream is = Files.newInputStream(Paths.get(file));
+    if (argsList.isEmpty()) {
+      printHelp();
+      System.exit(0);
+    } else if (argsList.size() > 1) {
+      System.out.println("Invalid number of arguments. Expected 1, found " + argsList.size());
+      System.exit(0);
+    }
+
+    String arg = argsList.get(0);
+    Path file = Paths.get(arg);
+    if (verbose) {
+      System.out.println("Opening " + file);
+    }
+
+    try (InputStream is = Files.newInputStream(file);
          DigestInputStream dis = new DigestInputStream(is, messageDigest)) {
     }
 
@@ -68,16 +83,23 @@ public class Main {
     }
   }
 
+  public static void printHelp() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp("chk", OPTIONS);
+    System.out.println();
+    printAlgorithms();
+    System.exit(0);
+  }
+
   public static void printAlgorithms() {
-    System.out.println("Supported Modes:");
+    System.out.println("Available Algorithms:");
     Provider[] providers = Security.getProviders();
     for (Provider p : providers) {
-      String providerStr = String.format("%s/%s/%f\n", p.getName(), p.getInfo(), p.getVersion());
+      //String providerStr = String.format("%s/%s/%f\n", p.getName(), p.getInfo(), p.getVersion());
       Set<Provider.Service> services = p.getServices();
       for (Provider.Service s : services) {
         if ("MessageDigest".equals(s.getType())) {
-          System.out.printf("\t%s/%s/%s", s.getType(),
-              s.getAlgorithm(), s.getClassName());
+          System.out.printf("%s\t%s%n", s.getAlgorithm(), s.getClassName());
         }
       }
     }
