@@ -32,7 +32,7 @@ public class Main {
     CommandLineParser parser = new DefaultParser();
     CommandLine cli = parser.parse(OPTIONS, args);
 
-    if (cli.hasOption("?")) {
+    if (cli.hasOption("h")) {
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp("chk", OPTIONS);
       System.exit(0);
@@ -56,8 +56,8 @@ public class Main {
     }
 
     String result = byteToHexString(messageDigest.digest());
-    if (cli.hasOption("v")) {
-      String validate = cli.getOptionValue("v");
+    if (cli.hasOption("e")) {
+      String validate = cli.getOptionValue("e");
       if (result.equalsIgnoreCase(validate)) {
         System.out.println("The hashes are equal");
       } else {
