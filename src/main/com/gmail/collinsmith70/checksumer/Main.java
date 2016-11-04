@@ -20,6 +20,8 @@ import java.security.Security;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.DatatypeConverter;
+
 public class Main {
 
   private static final Options OPTIONS = new Options();
@@ -66,22 +68,30 @@ public class Main {
       System.out.println("Opening " + file);
     }
 
+    InputStream is = Files.newInputStream(file);
+    DigestInputStream dis = new DigestInputStream(is, messageDigest);
+
     long total = Files.size(file);
-    long current = 0;
-    try (InputStream is = Files.newInputStream(file);
-         DigestInputStream dis = new DigestInputStream(is, messageDigest)) {
-      dis.read();
-      if (verbose) {
-        current += dis.available();
-        if (total == 0L) {
-          System.out.println("100.00%");
-        } else {
-          System.out.printf("%.02f%%%n", (double) current / total * 100);
+    long offset = 0;
+    byte[] buffer = new byte[8192];
+    try {
+      ProgressBar progressBar = new ProgressBar();
+      int read;
+      while ((read = dis.read(buffer)) != -1) {
+        offset += read;
+        if (verbose) {
+          if (total == 0L) {
+            progressBar.update(total, total);
+          } else {
+            progressBar.update(offset, total);
+          }
         }
       }
+    } finally {
+      dis.close();
     }
 
-    String result = byteToHexString(messageDigest.digest());
+    String result = DatatypeConverter.printHexBinary(messageDigest.digest());
     if (cli.hasOption("e")) {
       String validate = cli.getOptionValue("e");
       if (result.equalsIgnoreCase(validate)) {
