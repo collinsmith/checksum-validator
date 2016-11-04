@@ -23,9 +23,9 @@ public class Main {
 
   private static final Options OPTIONS = new Options();
   static {
-    OPTIONS.addOption("?", "help", true, "Prints this message");
+    OPTIONS.addOption("h", "help", false, "Prints this message");
     OPTIONS.addOption("m", "mode", true, "Algorithm to use (only md5 supported currently)");
-    OPTIONS.addOption("v", "validate", true, "Validates that the hash against this string");
+    OPTIONS.addOption("e", "equals", true, "Validates that the hash against this string");
   }
 
   public static void main(String... args) throws ParseException, IOException {
