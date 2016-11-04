@@ -94,10 +94,8 @@ public class Main {
     String result = DatatypeConverter.printHexBinary(messageDigest.digest());
     if (cli.hasOption("e")) {
       String validate = cli.getOptionValue("e");
-      if (result.equalsIgnoreCase(validate)) {
-        System.out.println("The hashes are equal");
-      } else {
-        System.out.println("The hashes are not equal");
+      if (!result.equalsIgnoreCase(validate)) {
+        System.out.println("Calculated hash does not match!");
       }
     } else {
       System.out.println(result);
