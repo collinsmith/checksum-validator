@@ -66,8 +66,19 @@ public class Main {
       System.out.println("Opening " + file);
     }
 
+    long total = Files.size(file);
+    long current = 0;
     try (InputStream is = Files.newInputStream(file);
          DigestInputStream dis = new DigestInputStream(is, messageDigest)) {
+      dis.read();
+      if (verbose) {
+        current += dis.available();
+        if (total == 0L) {
+          System.out.println("100.00%");
+        } else {
+          System.out.printf("%.02f%%%n", (double) current / total * 100);
+        }
+      }
     }
 
     String result = byteToHexString(messageDigest.digest());
