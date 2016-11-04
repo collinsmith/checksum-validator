@@ -34,7 +34,7 @@ public class ProgressBar {
     String percentage = String.format("%.02f%%", percent);
     System.out.printf("\r%7s [%-50s]", percentage, progress);
 
-    if (done == total) {
+    if (done >= total) {
       System.out.flush();
       System.out.println();
       init();
