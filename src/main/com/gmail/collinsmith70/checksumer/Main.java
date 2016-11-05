@@ -8,19 +8,14 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.List;
 import java.util.Set;
-
-import javax.xml.bind.DatatypeConverter;
 
 public class Main {
 
@@ -68,38 +63,33 @@ public class Main {
       System.out.println("Opening " + file);
     }
 
-    InputStream is = Files.newInputStream(file);
-    DigestInputStream dis = new DigestInputStream(is, messageDigest);
+    ProgressBar progressBar = new ProgressBar();
+    ChecksumCalculator checksumCalculator = new ChecksumCalculator(file, messageDigest,
+        (result) -> {
+          if (cli.hasOption("e")) {
+            String validate = cli.getOptionValue("e");
+            if (!result.equalsIgnoreCase(validate)) {
+              System.out.println("Calculated hash does not match!");
+            }
+          } else {
+            System.out.println(result);
+          }
+        },
+        (e) -> {
+          e.printStackTrace();
+        },
+        (progress, total) -> {
+          if (!verbose) {
+            return;
+          }
 
-    long total = Files.size(file);
-    long offset = 0;
-    byte[] buffer = new byte[8192];
-    try {
-      ProgressBar progressBar = new ProgressBar();
-      int read;
-      while ((read = dis.read(buffer)) != -1) {
-        offset += read;
-        if (verbose) {
           if (total == 0L) {
             progressBar.update(total, total);
           } else {
-            progressBar.update(offset, total);
+            progressBar.update(progress, total);
           }
-        }
-      }
-    } finally {
-      dis.close();
-    }
-
-    String result = DatatypeConverter.printHexBinary(messageDigest.digest());
-    if (cli.hasOption("e")) {
-      String validate = cli.getOptionValue("e");
-      if (!result.equalsIgnoreCase(validate)) {
-        System.out.println("Calculated hash does not match!");
-      }
-    } else {
-      System.out.println(result);
-    }
+        });
+    checksumCalculator.run();
   }
 
   public static void printHelp() {
