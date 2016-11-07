@@ -24,7 +24,7 @@ public class Main {
     OPTIONS.addOption("h", "help", false, "Prints this message");
     OPTIONS.addOption("m", "mode", true, "Algorithm to use (Defaults to MD5)");
     OPTIONS.addOption("e", "equals", true, "Validates that the hash against this string");
-    OPTIONS.addOption("v", "verbose", false, "Increases the verbosity of the command");
+    OPTIONS.addOption("v", "verbose", false, "Outputs progress of calculation");
   }
 
   public static void main(String... args) throws ParseException, IOException {
