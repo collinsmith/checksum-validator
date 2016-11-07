@@ -70,6 +70,8 @@ public class Main {
             String validate = cli.getOptionValue("e");
             if (!result.equalsIgnoreCase(validate)) {
               System.out.println("Calculated hash does not match!");
+            } else {
+              System.out.println("Calculated hash matches!");
             }
           } else {
             System.out.println(result);
