@@ -9,7 +9,7 @@ usage: chk
  -e,--equals <arg>   Validates that the hash against this string
  -h,--help           Prints this message
  -m,--mode <arg>     Algorithm to use (Defaults to MD5)
- -v,--verbose        Increases the verbosity of the command
+ -v,--verbose        Outputs progress of calculation
 
 Available Algorithms:
 MD2     sun.security.provider.MD2
@@ -31,4 +31,11 @@ Compare calculated checksum /w source:
 ```
 chk.jar file.txt -e 702EDCA0B2181C15D457EACAC39DE39B
 Calculated hash matches!
+```
+Output checksum of file /w verbosity increased (for larger files):
+```
+chk.jar file.txt -v
+Opening file.txt
+100.00% [==================================================]
+702EDCA0B2181C15D457EACAC39DE39B
 ```
