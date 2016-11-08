@@ -6,7 +6,7 @@ Help dialog:
 ```
 chk.jar -h
 usage: chk
- -e,--equals <arg>   Validates that the hash against this string
+ -d,--diff <arg>     Checks the difference between this hash and the computed one
  -h,--help           Prints this message
  -m,--mode <arg>     Algorithm to use (Defaults to MD5)
  -v,--verbose        Outputs progress of calculation
@@ -29,7 +29,7 @@ chk.jar file.txt
 ```
 Compare calculated checksum /w source:
 ```
-chk.jar file.txt -e 702EDCA0B2181C15D457EACAC39DE39B
+chk.jar file.txt -d 702EDCA0B2181C15D457EACAC39DE39B
 Calculated hash matches!
 ```
 Output checksum of file /w verbosity increased (for larger files):
