@@ -23,7 +23,7 @@ public class Main {
   static {
     OPTIONS.addOption("h", "help", false, "Prints this message");
     OPTIONS.addOption("m", "mode", true, "Algorithm to use (Defaults to MD5)");
-    OPTIONS.addOption("e", "equals", true, "Validates that the hash against this string");
+    OPTIONS.addOption("d", "diff", true, "Checks the difference between this hash and the computed one");
     OPTIONS.addOption("v", "verbose", false, "Outputs progress of calculation");
   }
 
@@ -66,8 +66,8 @@ public class Main {
     ProgressBar progressBar = new ProgressBar();
     ChecksumCalculator checksumCalculator = new ChecksumCalculator(file, messageDigest,
         (result) -> {
-          if (cli.hasOption("e")) {
-            String validate = cli.getOptionValue("e");
+          if (cli.hasOption("d")) {
+            String validate = cli.getOptionValue("d");
             if (!result.equalsIgnoreCase(validate)) {
               System.out.println("Calculated hash does not match!");
             } else {
