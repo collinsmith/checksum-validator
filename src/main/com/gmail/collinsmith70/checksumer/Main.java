@@ -27,7 +27,9 @@ public class Main {
     OPTIONS.addOption("v", "verbose", false, "Outputs progress of calculation");
   }
 
-  public static void main(String... args) throws ParseException, IOException {
+  private static final long updateDelay = 25;
+
+  public static void main(String... args) throws ParseException, IOException, InterruptedException {
     CommandLineParser parser = new DefaultParser();
     CommandLine cli = parser.parse(OPTIONS, args);
 
@@ -63,35 +65,40 @@ public class Main {
       System.out.println("Opening " + file);
     }
 
-    ProgressBar progressBar = new ProgressBar();
-    ChecksumCalculator checksumCalculator = new ChecksumCalculator(file, messageDigest,
-        (result) -> {
-          if (cli.hasOption("d")) {
-            String validate = cli.getOptionValue("d");
-            if (!result.equalsIgnoreCase(validate)) {
-              System.out.println("Calculated hash does not match!");
-            } else {
-              System.out.println("Calculated hash matches!");
-            }
-          } else {
-            System.out.println(result);
-          }
-        },
-        (e) -> {
-          e.printStackTrace();
-        },
-        (progress, total) -> {
-          if (!verbose) {
-            return;
-          }
+    ChecksumCalculator calculator
+        = new ChecksumCalculator(file, messageDigest, e -> e.printStackTrace());
 
-          if (total == 0L) {
-            progressBar.update(total, total);
-          } else {
-            progressBar.update(progress, total);
-          }
-        });
-    checksumCalculator.run();
+    Thread t = new Thread(calculator);
+    t.setName("ChecksumCalculator");
+    t.start();
+
+    if (verbose) {
+      ProgressBar progressBar = new ProgressBar();
+      while (t.isAlive()) {
+        if (calculator.hasStarted()) {
+          progressBar.update(calculator.getOffset(), calculator.getTotal());
+        }
+
+        Thread.sleep(updateDelay);
+      }
+
+      progressBar.update(calculator.getTotal(), calculator.getTotal());
+    } else {
+      t.join();
+    }
+
+    String result = calculator.getResult();
+    if (cli.hasOption("d")) {
+      String validate = cli.getOptionValue("d");
+      if (!result.equalsIgnoreCase(validate)) {
+        System.out.println("Calculated hash does not match!");
+      } else {
+        System.out.println("Calculated hash matches!");
+      }
+    } else {
+      System.out.println(result);
+    }
+
   }
 
   public static void printHelp() {

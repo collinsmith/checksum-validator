@@ -15,23 +15,44 @@ public class ChecksumCalculator implements Runnable {
 
   private final Path path;
   private final MessageDigest messageDigest;
-  private final ResultCallback resultCallback;
   private final IOExceptionCallback IOExceptionCallback;
-  private final ProgressCallback progressCallback;
 
-  public ChecksumCalculator(Path p, MessageDigest messageDigest, ResultCallback resultCallback,
-                            IOExceptionCallback IOExceptionCallback,
-                            ProgressCallback progressCallback) {
+  private String result;
+  private long total;
+  private long offset;
+  private boolean started;
+
+  public ChecksumCalculator(Path p, MessageDigest messageDigest,
+                            IOExceptionCallback IOExceptionCallback) {
     Validate.isTrue(p != null);
     Validate.isTrue(messageDigest != null);
-    Validate.isTrue(resultCallback != null);
     Validate.isTrue(IOExceptionCallback != null);
 
     this.path = p;
     this.messageDigest = messageDigest;
-    this.resultCallback = resultCallback;
     this.IOExceptionCallback = IOExceptionCallback;
-    this.progressCallback = progressCallback;
+
+    this.started = false;
+  }
+
+  public long getOffset() {
+    return offset;
+  }
+
+  public long getTotal() {
+    return total;
+  }
+
+  public double getProgress() {
+    return (double)offset / total;
+  }
+
+  public boolean hasStarted() {
+    return started;
+  }
+
+  public String getResult() {
+    return result;
   }
 
   @Override
@@ -40,35 +61,24 @@ public class ChecksumCalculator implements Runnable {
       InputStream is = Files.newInputStream(path);
       DigestInputStream dis = new DigestInputStream(is, messageDigest);
 
-      long total = Files.size(path);
-      long offset = 0;
+      this.result = "Calculating...";
+      this.total = Files.size(path);
+      this.offset = 0;
+      this.started = true;
       byte[] buffer = new byte[8192];
       try {
-        ProgressBar progressBar = new ProgressBar();
         int read;
         while ((read = dis.read(buffer)) != -1) {
           offset += read;
-          if (progressCallback != null) {
-            progressCallback.onProgress(offset, total);
-          }
         }
       } finally {
         dis.close();
       }
 
-      String result = DatatypeConverter.printHexBinary(messageDigest.digest());
-      resultCallback.onResult(result);
+      this.result = DatatypeConverter.printHexBinary(messageDigest.digest());
     } catch (IOException e) {
       IOExceptionCallback.onIOException(e);
     }
-  }
-
-  public interface ProgressCallback {
-    void onProgress(long progress, long total);
-  }
-
-  public interface ResultCallback {
-    void onResult(String hash);
   }
 
   public interface IOExceptionCallback {
