@@ -54,13 +54,15 @@ public class Main {
     if (argsList.isEmpty()) {
       printHelp();
       System.exit(0);
-    } else if (argsList.size() > 1) {
-      System.out.println("Invalid number of arguments. Expected 1, found " + argsList.size());
-      System.exit(0);
     }
 
-    String arg = argsList.get(0);
-    Path file = Paths.get(arg);
+    for (String arg : argsList) {
+      chk(cli, arg, messageDigest, verbose);
+    }
+  }
+
+  private static void chk(CommandLine cli, String path, MessageDigest messageDigest, boolean verbose) throws InterruptedException {
+    Path file = Paths.get(path);
     if (verbose) {
       System.out.println("Opening " + file);
     }
@@ -112,7 +114,6 @@ public class Main {
     } else {
       System.out.println(result);
     }
-
   }
 
   public static void printHelp() {
