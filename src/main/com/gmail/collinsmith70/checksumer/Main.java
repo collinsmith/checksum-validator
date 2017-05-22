@@ -73,16 +73,30 @@ public class Main {
     t.start();
 
     if (verbose) {
-      ProgressBar progressBar = new ProgressBar();
+      ProgressBar progressBar = null;
       while (t.isAlive()) {
         if (calculator.hasStarted()) {
-          progressBar.update(calculator.getOffset(), calculator.getTotal());
+          if (progressBar == null) {
+            progressBar = new ProgressBar(calculator.getTotal());
+          } else {
+            System.out.print(ProgressBar.DELETE_STRING);
+          }
+
+          progressBar.update(calculator.getOffset());
+          System.out.print(progressBar);
         }
 
         Thread.sleep(updateDelay);
       }
 
-      progressBar.update(calculator.getTotal(), calculator.getTotal());
+      if (progressBar == null) {
+        progressBar = new ProgressBar(calculator.getTotal());
+      } else {
+        System.out.print(ProgressBar.DELETE_STRING);
+      }
+
+      progressBar.update(calculator.getTotal());
+      System.out.println(progressBar);
     } else {
       t.join();
     }
