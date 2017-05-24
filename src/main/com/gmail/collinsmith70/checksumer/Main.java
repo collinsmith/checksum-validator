@@ -116,7 +116,7 @@ public class Main {
     }
   }
 
-  public static void printHelp() {
+  private static void printHelp() {
     HelpFormatter formatter = new HelpFormatter();
     formatter.printHelp("chk", OPTIONS);
     System.out.println();
@@ -124,7 +124,7 @@ public class Main {
     System.exit(0);
   }
 
-  public static void printAlgorithms() {
+  private static void printAlgorithms() {
     System.out.println("Available Algorithms:");
     Provider[] providers = Security.getProviders();
     for (Provider p : providers) {
