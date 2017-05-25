@@ -68,7 +68,7 @@ public class Main {
     }
 
     ChecksumCalculator calculator
-        = new ChecksumCalculator(file, messageDigest, e -> e.printStackTrace());
+        = new ChecksumCalculator(file, messageDigest, Throwable::printStackTrace);
 
     Thread t = new Thread(calculator);
     t.setName("ChecksumCalculator");
