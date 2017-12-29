@@ -1,1 +1,1 @@
-java -jar checksummer-all-1.0-SNAPSHOT.jar %*
+java -jar checksummer-all-1.1-SNAPSHOT.jar %*
