@@ -1,5 +1,6 @@
 package com.gmail.collinsmith70.checksumer;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
@@ -8,8 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-
-import javax.xml.bind.DatatypeConverter;
 
 public class ChecksumCalculator implements Runnable {
 
@@ -75,7 +74,7 @@ public class ChecksumCalculator implements Runnable {
         dis.close();
       }
 
-      this.result = DatatypeConverter.printHexBinary(messageDigest.digest());
+      this.result = Hex.encodeHexString(messageDigest.digest());
     } catch (IOException e) {
       IOExceptionCallback.onIOException(e);
     }
