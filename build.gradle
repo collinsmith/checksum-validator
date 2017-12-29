@@ -5,6 +5,9 @@ apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
+sourceSets.main.java.srcDirs = ["src/main"]
+sourceSets.test.java.srcDirs = ["src/test"]
+
 repositories {
     mavenCentral()
 }
